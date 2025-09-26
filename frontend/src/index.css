@@ -1,0 +1,192 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Modern Glassmorphic Project Management Design System */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    /* Base colors - Modern white theme */
+    --background: 0 0% 98%;
+    --foreground: 220 13% 18%;
+
+    /* Glassmorphic card system */
+    --card: 0 0% 100%;
+    --card-foreground: 220 13% 18%;
+    --card-glass: 0 0% 100% / 0.8;
+    --card-glass-border: 0 0% 100% / 0.2;
+
+    /* Popover system */
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 13% 18%;
+
+    /* Primary brand colors */
+    --primary: 220 13% 18%;
+    --primary-foreground: 0 0% 98%;
+    --primary-glass: 220 13% 18% / 0.9;
+
+    /* Secondary system */
+    --secondary: 220 13% 95%;
+    --secondary-foreground: 220 13% 18%;
+    --secondary-glass: 220 13% 95% / 0.6;
+
+    /* Muted system */
+    --muted: 220 13% 96%;
+    --muted-foreground: 220 9% 46%;
+
+    /* Accent system */
+    --accent: 213 94% 68%;
+    --accent-foreground: 0 0% 98%;
+    --accent-glass: 213 94% 68% / 0.1;
+
+    /* Status colors */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 98%;
+    --success-glass: 142 76% 36% / 0.1;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 98%;
+    --warning-glass: 38 92% 50% / 0.1;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --destructive-glass: 0 84% 60% / 0.1;
+
+    /* Border and input system */
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 213 94% 68%;
+
+    /* Glassmorphic effects */
+    --glass-shadow: 0 8px 32px hsl(220 13% 18% / 0.1);
+    --glass-shadow-hover: 0 16px 48px hsl(220 13% 18% / 0.15);
+    --glass-border: 1px solid hsl(0 0% 100% / 0.2);
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(213 94% 68% / 0.1), hsl(220 13% 95% / 0.8));
+    --gradient-glass: linear-gradient(135deg, hsl(0 0% 100% / 0.9), hsl(0 0% 100% / 0.6));
+    --gradient-accent: linear-gradient(135deg, hsl(213 94% 68%), hsl(213 94% 58%));
+
+    --radius: 12px;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-inter;
+    background: linear-gradient(135deg, hsl(0 0% 98%), hsl(220 13% 96%));
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  /* Glassmorphic card base */
+  .glass-card {
+    @apply backdrop-blur-lg border border-white/20 shadow-[var(--glass-shadow)] hover:shadow-[var(--glass-shadow-hover)] transition-all duration-300;
+    background: var(--gradient-glass);
+  }
+
+  /* Interactive glassmorphic card */
+  .glass-card-interactive {
+    @apply glass-card hover:scale-[1.02] cursor-pointer;
+  }
+
+  /* Status indicators */
+  .status-todo {
+    @apply bg-muted text-muted-foreground;
+  }
+
+  .status-progress {
+    @apply bg-warning/10 text-warning border-warning/20;
+  }
+
+  .status-done {
+    @apply bg-success/10 text-success border-success/20;
+  }
+
+  /* Gradient buttons */
+  .btn-gradient {
+    @apply bg-gradient-to-r from-accent to-accent/90 text-accent-foreground hover:from-accent/90 hover:to-accent/80 transition-all duration-300 shadow-lg hover:shadow-xl;
+  }
+
+  /* Progress bars */
+  .progress-glass {
+    @apply bg-secondary/50 backdrop-blur-sm border border-white/10 rounded-full overflow-hidden;
+  }
+
+  .progress-fill {
+    @apply h-full bg-gradient-to-r from-accent to-accent/80 rounded-full transition-all duration-500 ease-out;
+  }
+
+  /* Animated elements */
+  .fade-in {
+    @apply animate-in fade-in-0 duration-300;
+  }
+
+  .slide-up {
+    @apply animate-in slide-in-from-bottom-4 duration-300;
+  }
+
+  .scale-in {
+    @apply animate-in zoom-in-95 duration-200;
+  }
+}
