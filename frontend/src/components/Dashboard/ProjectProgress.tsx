@@ -4,7 +4,7 @@ interface Project {
   progress: number;
   dueDate: string;
   team: number;
-  status: 'on-track' | 'at-risk' | 'delayed';
+  status: 'on-track' | 'at-risk' | 'completed' |'delayed';
 }
 
 interface ProjectProgressProps {

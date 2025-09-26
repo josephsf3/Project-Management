@@ -6,55 +6,59 @@ import axios, { AxiosError } from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 import { AuthContext } from "../context/AuthContext";
 
-interface LoginFormData {
+interface SignupFormData {
+  name: string;
   email: string;
   password: string;
-  rememberMe: boolean;
+  confirmPassword: string;
 }
 
 interface ValidationErrors {
+  name?: string;
   email?: string;
   password?: string;
+  confirmPassword?: string;
   general?: string;
 }
 
-interface JwtPayload {
-  role: "Admin" | "ProjectManager" | "Developer";
-  email: string;
-  name: string;
-}
-
-export default function Login() {
+export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<ValidationErrors>({});
-  const [formData, setFormData] = useState<LoginFormData>({
+  const [formData, setFormData] = useState<SignupFormData>({
+    name: "",
     email: "",
     password: "",
-    rememberMe: false
+    confirmPassword: ""
   });
 
-  const { login, token, role, logout } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   // Validation
   const validateForm = (): boolean => {
     const newErrors: ValidationErrors = {};
+    if (!formData.name) newErrors.name = "Name is required";
+
     if (!formData.email) newErrors.email = "Email is required";
     else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Enter a valid email";
+
     if (!formData.password) newErrors.password = "Password is required";
     else if (formData.password.length < 6) newErrors.password = "Password must be at least 6 characters";
+
+    if (formData.password !== formData.confirmPassword)
+      newErrors.confirmPassword = "Passwords do not match";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle login
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validateForm()) return;
 
@@ -62,40 +66,28 @@ export default function Login() {
     setErrors({});
 
     try {
-      const response = await axios.post<{ token: string }>("http://localhost:5000/api/auth/login", {
-        email: formData.email,
-        password: formData.password
-      });
+      const response = await axios.post<{ token: string }>(
+        "http://localhost:5000/api/auth/signup",
+        {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password
+        }
+      );
 
       const { token } = response.data;
-      const decoded = JSON.parse(atob(token.split(".")[1])) as JwtPayload;
+      login(token, "Developer"); // Or assign role based on backend
 
-      login(token, decoded.role);
-
-      // Role-based navigation
-      switch (decoded.role) {
-        case "Admin":
-          navigate("/dashboard");
-          break;
-        case "ProjectManager":
-          navigate("/dashboard/projects");
-          break;
-        case "Developer":
-          navigate("/dashboard/tasks");
-          break;
-        default:
-          navigate("/dashboard");
-      }
-
+      navigate("/dashboard"); // Redirect after signup
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
-      setErrors({ general: error.response?.data?.message || "Login failed. Please try again." });
+      setErrors({ general: error.response?.data?.message || "Signup failed. Please try again." });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleInputChange = (field: keyof LoginFormData, value: string | boolean) => {
+  const handleInputChange = (field: keyof SignupFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field as keyof ValidationErrors]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
@@ -114,8 +106,8 @@ export default function Login() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-accent to-accent/80 rounded-2xl mb-4">
             <FolderKanban className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-foreground">Welcome Back</h1>
-          <p className="text-muted-foreground mt-2">Sign in to access your dashboard</p>
+          <h1 className="text-3xl font-bold text-foreground">Create Account</h1>
+          <p className="text-muted-foreground mt-2">Sign up to start managing your projects</p>
         </div>
 
         <div className="glass-card p-8 scale-in">
@@ -126,7 +118,20 @@ export default function Login() {
             </Alert>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleSignup} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-sm font-medium text-foreground">Full Name</Label>
+              <Input
+                id="name"
+                placeholder="Enter your full name"
+                value={formData.name}
+                onChange={e => handleInputChange("name", e.target.value)}
+                disabled={isLoading}
+                className={errors.name ? "border-destructive/50" : ""}
+              />
+              {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium text-foreground">Email address</Label>
               <Input
@@ -147,7 +152,7 @@ export default function Login() {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
+                  placeholder="Enter password"
                   value={formData.password}
                   onChange={e => handleInputChange("password", e.target.value)}
                   disabled={isLoading}
@@ -159,30 +164,35 @@ export default function Login() {
               {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="remember"
-                  checked={formData.rememberMe}
-                  onCheckedChange={checked => handleInputChange("rememberMe", !!checked)}
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">Confirm Password</Label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm password"
+                  value={formData.confirmPassword}
+                  onChange={e => handleInputChange("confirmPassword", e.target.value)}
                   disabled={isLoading}
                 />
-                <Label htmlFor="remember" className="text-sm text-muted-foreground cursor-pointer">Remember me</Label>
+                <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
-              <button type="button" className="text-sm text-accent hover:text-accent/80" disabled={isLoading}>Forgot password?</button>
+              {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword}</p>}
             </div>
 
             <Button type="submit" className="w-full btn-gradient" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Sign in"}
+              {isLoading ? "Creating account..." : "Sign up"}
             </Button>
-            <p className="text-sm text-muted-foreground">
-              Don’t have an account?{" "}
-              <Link to="/signup" className="text-accent hover:text-accent/80">
-                Sign up
-              </Link>
-            </p>
-
           </form>
+
+          <p className="text-center mt-4 text-sm text-muted-foreground">
+            Already have an account?{" "}
+            <Link to="/login" className="text-accent hover:text-accent/80 font-medium">
+              Sign in
+            </Link>
+          </p>
         </div>
       </div>
     </div>

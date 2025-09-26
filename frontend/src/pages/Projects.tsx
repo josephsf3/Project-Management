@@ -3,68 +3,23 @@ import { Plus, Search, Calendar, Users, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Project } from "@/types/projects";
 
-interface Project {
-  id: string;
-  name: string;
-  description: string;
-  progress: number;
-  dueDate: string;
-  teamSize: number;
-  status: 'active' | 'completed' | 'on-hold';
-  priority: 'high' | 'medium' | 'low';
-}
-
+// Mock projects data
 const projects: Project[] = [
-  {
-    id: "1",
-    name: "E-commerce Platform",
-    description: "Modern shopping platform with AI-powered recommendations",
-    progress: 78,
-    dueDate: "2024-12-15",
-    teamSize: 6,
-    status: "active",
-    priority: "high"
-  },
-  {
-    id: "2",
-    name: "Mobile App Redesign",
-    description: "Complete UI/UX overhaul for better user experience",
-    progress: 45,
-    dueDate: "2025-01-10",
-    teamSize: 4,
-    status: "active",
-    priority: "medium"
-  },
-  {
-    id: "3",
-    name: "API Integration",
-    description: "Third-party service integrations and webhook setup",
-    progress: 92,
-    dueDate: "2024-11-30",
-    teamSize: 3,
-    status: "active",
-    priority: "high"
-  },
-  {
-    id: "4",
-    name: "Analytics Dashboard",
-    description: "Real-time analytics and reporting dashboard",
-    progress: 100,
-    dueDate: "2024-11-15",
-    teamSize: 2,
-    status: "completed",
-    priority: "medium"
-  }
+  { id: "1", name: "E-commerce Platform", description: "Modern shopping platform with AI-powered recommendations", progress: 78, dueDate: "2024-12-15", teamSize: 6, status: "active", priority: "high" },
+  { id: "2", name: "Mobile App Redesign", description: "Complete UI/UX overhaul for better user experience", progress: 45, dueDate: "2025-01-10", teamSize: 4, status: "active", priority: "medium" },
+  { id: "3", name: "API Integration", description: "Third-party service integrations and webhook setup", progress: 92, dueDate: "2024-11-30", teamSize: 3, status: "active", priority: "high" },
+  { id: "4", name: "Analytics Dashboard", description: "Real-time analytics and reporting dashboard", progress: 100, dueDate: "2024-11-15", teamSize: 2, status: "completed", priority: "medium" },
 ];
 
 export default function Projects() {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'completed' | 'on-hold'>('all');
 
   const filteredProjects = projects.filter(project => {
     const matchesSearch = project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         project.description.toLowerCase().includes(searchTerm.toLowerCase());
+      project.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === 'all' || project.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
@@ -115,7 +70,7 @@ export default function Projects() {
               className="pl-10 bg-white/30 border-white/20"
             />
           </div>
-          
+
           <div className="flex gap-2">
             {(['all', 'active', 'completed', 'on-hold'] as const).map((status) => (
               <Button
@@ -156,8 +111,8 @@ export default function Projects() {
                   <span className="text-sm font-medium text-foreground">{project.progress}%</span>
                 </div>
                 <div className="progress-glass h-2">
-                  <div 
-                    className="progress-fill" 
+                  <div
+                    className="progress-fill"
                     style={{ width: `${project.progress}%` }}
                   />
                 </div>
