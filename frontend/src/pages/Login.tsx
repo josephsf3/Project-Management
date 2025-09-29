@@ -62,7 +62,7 @@ export default function Login() {
     setErrors({});
 
     try {
-      const response = await axios.post<{ token: string }>("http://localhost:5000/api/auth/login", {
+      const response = await axios.post<{ token: string }>("http://localhost:4090/api/auth/login", {
         email: formData.email,
         password: formData.password
       });

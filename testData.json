@@ -1,0 +1,42 @@
+[
+  {
+    "title": "Design user authentication flow",
+    "description": "Create wireframes and user journey for login/signup process",
+    "assignee": "Sarah Johnson",
+    "project": "E-commerce Platform",
+    "priority": "high",
+    "status": "todo",
+    "dueDate": "2024-11-25",
+    "createdAt": "2024-11-20"
+  },
+  {
+    "title": "Implement payment gateway",
+    "description": "Integrate Stripe payment processing with error handling",
+    "assignee": "Mike Chen",
+    "project": "E-commerce Platform",
+    "priority": "high",
+    "status": "progress",
+    "dueDate": "2024-11-28",
+    "createdAt": "2024-11-18"
+  },
+  {
+    "title": "Database schema optimization",
+    "description": "Optimize queries and add proper indexing for better performance",
+    "assignee": "Alex Rodriguez",
+    "project": "API Integration",
+    "priority": "medium",
+    "status": "review",
+    "dueDate": "2024-12-02",
+    "createdAt": "2024-11-15"
+  },
+  {
+    "title": "Mobile responsive design fixes",
+    "description": "Fix layout issues on mobile devices and tablets",
+    "assignee": "Emily Davis",
+    "project": "Mobile App Redesign",
+    "priority": "low",
+    "status": "done",
+    "dueDate": "2024-11-20",
+    "createdAt": "2024-11-10"
+  }
+]

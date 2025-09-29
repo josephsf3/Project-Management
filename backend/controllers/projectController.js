@@ -1,7 +1,8 @@
 import Project from '../models/Project.js';
 
 export const getProjects = async (req, res) => {
-  const projects = await Project.find().populate('team', 'username role');
+  const projects = await Project.find().populate();
+  // const projects = await Project.find().populate('team', 'username role');
   res.json(projects);
 };
 

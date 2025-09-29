@@ -8,17 +8,19 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
-  const { token, role } = useContext(AuthContext);
+  const auth = useContext(AuthContext);
 
-  // Not logged in
+  if (!auth) return null; // Context not ready
+
+  const { token, role } = auth;
+
   if (!token) return <Navigate to="/login" replace />;
-
-  // Role-based access control
   if (allowedRoles && !allowedRoles.includes(role!)) {
     return <Navigate to="/unauthorized" replace />;
   }
 
   return children;
 };
+
 
 export default ProtectedRoute;

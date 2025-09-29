@@ -1,11 +1,12 @@
-import { useState } from "react";
-import { Plus, Filter, Calendar, User, Flag } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Plus, Filter, Calendar, User, Flag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import axios from "axios";
 
-interface Task {
-  id: string;
+export interface Task {
+  _id: string;
   title: string;
   description: string;
   assignee: string;
@@ -16,61 +17,34 @@ interface Task {
   createdAt: string;
 }
 
-const tasks: Task[] = [
-  {
-    id: "1",
-    title: "Design user authentication flow",
-    description: "Create wireframes and user journey for login/signup process",
-    assignee: "Sarah Johnson",
-    project: "E-commerce Platform",
-    priority: "high",
-    status: "todo",
-    dueDate: "2024-11-25",
-    createdAt: "2024-11-20"
-  },
-  {
-    id: "2",
-    title: "Implement payment gateway",
-    description: "Integrate Stripe payment processing with error handling",
-    assignee: "Mike Chen",
-    project: "E-commerce Platform",
-    priority: "high",
-    status: "progress",
-    dueDate: "2024-11-28",
-    createdAt: "2024-11-18"
-  },
-  {
-    id: "3",
-    title: "Database schema optimization",
-    description: "Optimize queries and add proper indexing for better performance",
-    assignee: "Alex Rodriguez",
-    project: "API Integration",
-    priority: "medium",
-    status: "review",
-    dueDate: "2024-12-02",
-    createdAt: "2024-11-15"
-  },
-  {
-    id: "4",
-    title: "Mobile responsive design fixes",
-    description: "Fix layout issues on mobile devices and tablets",
-    assignee: "Emily Davis",
-    project: "Mobile App Redesign",
-    priority: "low",
-    status: "done",
-    dueDate: "2024-11-20",
-    createdAt: "2024-11-10"
-  }
-];
 
 export default function Tasks() {
   const [selectedStatus, setSelectedStatus] = useState<'all' | Task['status']>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [showModal, setShowModal] = useState(false);
+  const [newTask, setNewTask] = useState({
+    title: '',
+    description: '',
+    assignee: '',
+    project: '',
+    priority: 'medium' as Task['priority'],
+    status: 'todo' as Task['status'],
+    dueDate: ''
+  });
+
+  useEffect(() => {
+    async function getTasks() {
+      const response = await axios.get('http://localhost:4090/api/tasks/all');
+      setTasks(response.data);
+    }
+    getTasks();
+  }, []);
 
   const filteredTasks = tasks.filter(task => {
     const matchesStatus = selectedStatus === 'all' || task.status === selectedStatus;
     const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         task.description.toLowerCase().includes(searchTerm.toLowerCase());
+      task.description.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesStatus && matchesSearch;
   });
 
@@ -101,6 +75,25 @@ export default function Tasks() {
     { value: 'done' as const, label: 'Done' }
   ];
 
+  const handleCreateTask = async () => {
+    try {
+      const response = await axios.post('http://localhost:4090/api/tasks', newTask);
+      setTasks(prev => [...prev, response.data]);
+      setShowModal(false);
+      setNewTask({
+        title: '',
+        description: '',
+        assignee: '',
+        project: '',
+        priority: 'medium',
+        status: 'todo',
+        dueDate: ''
+      });
+    } catch (error) {
+      console.error("Error creating task:", error);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -110,12 +103,73 @@ export default function Tasks() {
             <h1 className="text-2xl font-bold text-foreground">Tasks</h1>
             <p className="text-muted-foreground">Track and manage all project tasks</p>
           </div>
-          <Button className="btn-gradient">
+          <Button className="btn-gradient" onClick={() => setShowModal(true)}>
             <Plus className="w-4 h-4 mr-2" />
             New Task
           </Button>
         </div>
       </div>
+
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md relative">
+            <X className="absolute top-4 right-4 w-5 h-5 cursor-pointer" onClick={() => setShowModal(false)} />
+            <h2 className="text-xl font-semibold mb-4">Create New Task</h2>
+            <div className="flex flex-col gap-3">
+              <Input
+                placeholder="Title"
+                value={newTask.title}
+                onChange={e => setNewTask({ ...newTask, title: e.target.value })}
+              />
+              <Input
+                placeholder="Description"
+                value={newTask.description}
+                onChange={e => setNewTask({ ...newTask, description: e.target.value })}
+              />
+              <Input
+                placeholder="Assignee"
+                value={newTask.assignee}
+                onChange={e => setNewTask({ ...newTask, assignee: e.target.value })}
+              />
+              <Input
+                placeholder="Project"
+                value={newTask.project}
+                onChange={e => setNewTask({ ...newTask, project: e.target.value })}
+              />
+              <Input
+                type="date"
+                value={newTask.dueDate}
+                onChange={e => setNewTask({ ...newTask, dueDate: e.target.value })}
+              />
+              <div className="flex gap-2">
+                <select
+                  value={newTask.priority}
+                  onChange={e => setNewTask({ ...newTask, priority: e.target.value as Task['priority'] })}
+                  className="flex-1 border rounded px-2 py-1"
+                >
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low</option>
+                </select>
+                <select
+                  value={newTask.status}
+                  onChange={e => setNewTask({ ...newTask, status: e.target.value as Task['status'] })}
+                  className="flex-1 border rounded px-2 py-1"
+                >
+                  <option value="todo">To Do</option>
+                  <option value="progress">In Progress</option>
+                  <option value="review">Review</option>
+                  <option value="done">Done</option>
+                </select>
+              </div>
+              <Button className="btn-gradient mt-3" onClick={handleCreateTask}>
+                Create Task
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="glass-card p-6 slide-up">
@@ -128,7 +182,7 @@ export default function Tasks() {
               className="bg-white/30 border-white/20"
             />
           </div>
-          
+
           <div className="flex gap-2 overflow-x-auto">
             {statusOptions.map((option) => (
               <Button
@@ -148,7 +202,7 @@ export default function Tasks() {
       {/* Tasks List */}
       <div className="space-y-4">
         {filteredTasks.map((task) => (
-          <div key={task.id} className="glass-card-interactive p-6 slide-up">
+          <div key={task._id} className="glass-card-interactive p-6 slide-up">
             <div className="flex flex-col lg:flex-row lg:items-center gap-4">
               <div className="flex-1">
                 <div className="flex items-start justify-between mb-2">
@@ -156,7 +210,7 @@ export default function Tasks() {
                   <Flag className={`w-4 h-4 ml-2 ${getPriorityColor(task.priority)}`} />
                 </div>
                 <p className="text-sm text-muted-foreground mb-3">{task.description}</p>
-                
+
                 <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                   <div className="flex items-center">
                     <User className="w-4 h-4 mr-1" />
@@ -169,11 +223,11 @@ export default function Tasks() {
                   <span className="text-accent font-medium">{task.project}</span>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 <Badge className={getStatusBadge(task.status)}>
-                  {task.status === 'progress' ? 'In Progress' : 
-                   task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+                  {task.status === 'progress' ? 'In Progress' :
+                    task.status.charAt(0).toUpperCase() + task.status.slice(1)}
                 </Badge>
                 <Button variant="outline" size="sm" className="bg-white/30 border-white/20">
                   Edit

@@ -1,14 +1,19 @@
 import Task from '../models/Task.js';
 
 export const getTasks = async (req, res) => {
-  let tasks;
-  if (req.user.role === 'Developer') {
-    tasks = await Task.find({ assignedTo: req.user.id }).populate('project', 'name');
-  } else {
-    tasks = await Task.find().populate('assignedTo', 'username').populate('project', 'name');
-  }
+  const tasks = await Task.find().populate();
   res.json(tasks);
 };
+
+// export const getTasks = async (req, res) => {
+//   let tasks;
+//   if (req.user.role === 'Developer') {
+//     tasks = await Task.find({ assignedTo: req.user.id }).populate('project', 'name');
+//   } else {
+//     tasks = await Task.find().populate('assignedTo', 'username').populate('project', 'name');
+//   }
+//   res.json(tasks);
+// };
 
 export const createTask = async (req, res) => {
   const { title, project, assignedTo, deadline } = req.body;

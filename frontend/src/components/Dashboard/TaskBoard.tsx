@@ -1,24 +1,25 @@
 import { CheckCircle, Clock, AlertTriangle } from "lucide-react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { Task } from "@/pages/Tasks";
 
-interface Task {
-  id: string;
-  title: string;
-  assignee: string;
-  priority: 'high' | 'medium' | 'low';
-  status: 'todo' | 'progress' | 'done';
-  dueDate: string;
-}
 
-interface TaskBoardProps {
-  tasks: Task[];
-}
-
-export default function TaskBoard({ tasks }: TaskBoardProps) {
+export default function TaskBoard() {
   const columns = [
     { id: 'todo', title: 'To Do', status: 'todo' as const },
     { id: 'progress', title: 'In Progress', status: 'progress' as const },
     { id: 'done', title: 'Done', status: 'done' as const }
   ];
+
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  useEffect(()=>{
+    async function getTasks() {
+      const response = await axios.get('http://localhost:4090/api/tasks/all');
+      setTasks(response.data);
+    }
+    getTasks();
+  },[]);
 
   const getPriorityIcon = (priority: Task['priority']) => {
     switch (priority) {
@@ -55,7 +56,7 @@ export default function TaskBoard({ tasks }: TaskBoardProps) {
                 .filter(task => task.status === column.status)
                 .map((task) => (
                   <div 
-                    key={task.id}
+                    key={task._id || `${crypto.randomUUID}`} 
                     className={`glass-card-interactive p-4 border-l-4 ${getPriorityColor(task.priority)} slide-up`}
                   >
                     <div className="flex items-start justify-between mb-2">

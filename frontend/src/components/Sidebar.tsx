@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { useState, useContext } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { 
   LayoutDashboard, 
   FolderKanban, 
@@ -8,28 +8,40 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  Menu,
   X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { AuthContext } from "@/context/AuthContext";
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Projects", href: "/dashboard/projects", icon: FolderKanban },
-  { name: "Tasks", href: "/dashboard/tasks", icon: CheckSquare },
-  { name: "Team", href: "/dashboard/team", icon: Users },
-  { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
-  { name: "Settings", href: "/dashboard/settings", icon: Settings },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["Admin", "ProjectManager", "Developer"] },
+  { name: "Projects", href: "/dashboard/projects", icon: FolderKanban, roles: ["Admin", "ProjectManager", "Developer"] },
+  { name: "Tasks", href: "/dashboard/tasks", icon: CheckSquare, roles: ["Admin","ProjectManager", "Developer"] },
+  { name: "Team", href: "/dashboard/team", icon: Users, roles: ["Admin", "ProjectManager"] },
+  { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3, roles: ["Admin"] },
+  { name: "Settings", href: "/dashboard/settings", icon: Settings, roles: ["Admin"] },
 ];
 
 interface SidebarProps {
   isOpen: boolean;
   onToggle: () => void;
-  userRole: 'admin' | 'pm' | 'developer';
 }
 
-export default function Sidebar({ isOpen, onToggle, userRole }: SidebarProps) {
+export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
+  const auth = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  if (!auth) return null;
+
+  const { logout,role } = auth;
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login"); // redirect after logout
+  };
+
+
   return (
     <>
       {/* Mobile backdrop */}
@@ -41,10 +53,12 @@ export default function Sidebar({ isOpen, onToggle, userRole }: SidebarProps) {
       )}
       
       {/* Sidebar */}
-      <div className={cn(
-        "fixed top-0 left-0 z-50 h-full w-72 transform transition-transform duration-300 lg:relative lg:translate-x-0",
-        isOpen ? "translate-x-0" : "-translate-x-full"
-      )}>
+      <div
+        className={cn(
+          "fixed top-0 left-0 z-50 h-full w-72 transform transition-transform duration-300 lg:relative lg:translate-x-0",
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
         <div className="glass-card h-full border-r border-white/10 rounded-none lg:rounded-r-2xl">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-white/10">
@@ -54,7 +68,7 @@ export default function Sidebar({ isOpen, onToggle, userRole }: SidebarProps) {
               </div>
               <div>
                 <h1 className="text-lg font-semibold text-foreground">ProjectFlow</h1>
-                <p className="text-xs text-muted-foreground capitalize">{userRole}</p>
+                <p className="text-xs text-muted-foreground capitalize">{role}</p>
               </div>
             </div>
             <Button
@@ -70,16 +84,16 @@ export default function Sidebar({ isOpen, onToggle, userRole }: SidebarProps) {
           {/* Navigation */}
           <nav className="flex-1 p-4">
             <ul className="space-y-2">
-              {navigation.map((item) => {
-                // Role-based access control
-                if (item.name === "Team" && userRole === "developer") return null;
-                if (item.name === "Analytics" && userRole === "developer") return null;
-                if (item.name === "Settings" && userRole !== "admin") return null;
-                
-                return (
+              {navigation
+                .filter((item) => {
+                  if (item.roles.includes(role)) return true;
+                  else return false;
+                })
+                .map((item) => (
                   <li key={item.name}>
                     <NavLink
                       to={item.href}
+                      end={item.href === "/dashboard"}
                       className={({ isActive }) =>
                         cn(
                           "flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group",
@@ -93,8 +107,7 @@ export default function Sidebar({ isOpen, onToggle, userRole }: SidebarProps) {
                       <span>{item.name}</span>
                     </NavLink>
                   </li>
-                );
-              })}
+                ))}
             </ul>
           </nav>
 
@@ -108,7 +121,12 @@ export default function Sidebar({ isOpen, onToggle, userRole }: SidebarProps) {
                 <p className="text-sm font-medium text-foreground truncate">John Doe</p>
                 <p className="text-xs text-muted-foreground truncate">john@company.com</p>
               </div>
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-muted-foreground hover:text-foreground"
+                onClick={handleLogout}
+              >
                 <LogOut className="w-4 h-4" />
               </Button>
             </div>

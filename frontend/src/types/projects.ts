@@ -1,10 +1,11 @@
 // Individual project type
 export interface Project {
-  id: string;
+  _id: string;
   name: string;
   description: string;
   progress: number; // 0-100
   dueDate: string; // ISO date string
+  team?: string[];
   teamSize: number;
   status: "active" | "completed" | "on-hold";
   priority: "high" | "medium" | "low";

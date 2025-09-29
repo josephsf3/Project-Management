@@ -8,7 +8,7 @@ interface TeamMember {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'pm' | 'developer';
+  role: 'Admin' | 'ProjectManager' | 'Developer';
   avatar: string;
   status: 'online' | 'offline' | 'away';
   projects: number;
@@ -21,7 +21,7 @@ const teamMembers: TeamMember[] = [
     id: "1",
     name: "John Doe",
     email: "john@company.com",
-    role: "admin",
+    role: "Admin",
     avatar: "JD",
     status: "online",
     projects: 8,
@@ -32,7 +32,7 @@ const teamMembers: TeamMember[] = [
     id: "2",
     name: "Sarah Johnson",
     email: "sarah@company.com",
-    role: "pm",
+    role: "ProjectManager",
     avatar: "SJ",
     status: "online",
     projects: 6,
@@ -43,7 +43,7 @@ const teamMembers: TeamMember[] = [
     id: "3",
     name: "Mike Chen",
     email: "mike@company.com",
-    role: "developer",
+    role: "Developer",
     avatar: "MC",
     status: "away",
     projects: 4,
@@ -54,7 +54,7 @@ const teamMembers: TeamMember[] = [
     id: "4",
     name: "Emily Davis",
     email: "emily@company.com",
-    role: "developer",
+    role: "Developer",
     avatar: "ED",
     status: "online",
     projects: 3,
@@ -65,7 +65,7 @@ const teamMembers: TeamMember[] = [
     id: "5",
     name: "Alex Rodriguez",
     email: "alex@company.com",
-    role: "pm",
+    role: "ProjectManager",
     avatar: "AR",
     status: "offline",
     projects: 5,
@@ -76,7 +76,7 @@ const teamMembers: TeamMember[] = [
 
 export default function Team() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterRole, setFilterRole] = useState<'all' | 'admin' | 'pm' | 'developer'>('all');
+  const [filterRole, setFilterRole] = useState<'all' | 'Admin' | 'ProjectManager' | 'Developer'>('all');
 
   const filteredMembers = teamMembers.filter(member => {
     const matchesSearch = member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -87,14 +87,14 @@ export default function Team() {
 
   const getRoleBadge = (role: TeamMember['role']) => {
     const variants = {
-      'admin': 'bg-destructive/10 text-destructive',
-      'pm': 'bg-accent/10 text-accent',
-      'developer': 'bg-success/10 text-success'
+      'Admin': 'bg-destructive/10 text-destructive',
+      'ProjectManager': 'bg-accent/10 text-accent',
+      'Developer': 'bg-success/10 text-success'
     };
     const labels = {
-      'admin': 'Admin',
-      'pm': 'Project Manager',
-      'developer': 'Developer'
+      'Admin': 'Admin',
+      'ProjectManager': 'Project Manager',
+      'Developer': 'Developer'
     };
     return { class: variants[role], label: labels[role] };
   };
@@ -110,9 +110,9 @@ export default function Team() {
 
   const roleOptions = [
     { value: 'all' as const, label: 'All Roles' },
-    { value: 'admin' as const, label: 'Admin' },
-    { value: 'pm' as const, label: 'Project Manager' },
-    { value: 'developer' as const, label: 'Developer' }
+    { value: 'Admin' as const, label: 'Admin' },
+    { value: 'ProjectManager' as const, label: 'Project Manager' },
+    { value: 'Developer' as const, label: 'Developer' }
   ];
 
   return (
@@ -185,9 +185,9 @@ export default function Team() {
 
               <div className="space-y-3">
                 <Badge className={roleBadge.class}>
-                  {member.role === 'admin' && <Shield className="w-3 h-3 mr-1" />}
-                  {member.role === 'pm' && <User className="w-3 h-3 mr-1" />}
-                  {member.role === 'developer' && <Settings className="w-3 h-3 mr-1" />}
+                  {member.role === 'Admin' && <Shield className="w-3 h-3 mr-1" />}
+                  {member.role === 'ProjectManager' && <User className="w-3 h-3 mr-1" />}
+                  {member.role === 'Developer' && <Settings className="w-3 h-3 mr-1" />}
                   {roleBadge.label}
                 </Badge>
 
@@ -228,19 +228,19 @@ export default function Team() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           <div className="text-center">
             <div className="text-2xl font-bold text-foreground mb-1">
-              {teamMembers.filter(m => m.role === 'admin').length}
+              {teamMembers.filter(m => m.role === 'Admin').length}
             </div>
             <div className="text-sm text-muted-foreground">Admins</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-foreground mb-1">
-              {teamMembers.filter(m => m.role === 'pm').length}
+              {teamMembers.filter(m => m.role === 'ProjectManager').length}
             </div>
             <div className="text-sm text-muted-foreground">Project Managers</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-foreground mb-1">
-              {teamMembers.filter(m => m.role === 'developer').length}
+              {teamMembers.filter(m => m.role === 'Developer').length}
             </div>
             <div className="text-sm text-muted-foreground">Developers</div>
           </div>

@@ -59,14 +59,14 @@ const App = () => (
 
             {/* Projects - Admin & PM */}
             <Route path="projects" element={
-              <RoleRoute allowedRoles={["Admin", "ProjectManager"]}>
+              <RoleRoute allowedRoles={["Admin", "ProjectManager", "Developer"]}>
                 <Projects />
               </RoleRoute>
             } />
 
             {/* Tasks - Admin & Developer */}
             <Route path="tasks" element={
-              <RoleRoute allowedRoles={["Admin", "Developer"]}>
+              <RoleRoute allowedRoles={["Admin","ProjectManager", "Developer"]}>
                 <Tasks />
               </RoleRoute>
             } />

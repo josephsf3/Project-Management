@@ -67,16 +67,17 @@ export default function Signup() {
 
     try {
       const response = await axios.post<{ token: string }>(
-        "http://localhost:5000/api/auth/signup",
+        "http://localhost:4090/api/auth/register",
         {
-          name: formData.name,
+          username: formData.name,
           email: formData.email,
-          password: formData.password
+          password: formData.password,
+          role: "Admin"
         }
       );
 
       const { token } = response.data;
-      login(token, "Developer"); // Or assign role based on backend
+      //login(token, "Developer"); // Or assign role based on backend
 
       navigate("/dashboard"); // Redirect after signup
     } catch (err) {

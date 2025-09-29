@@ -7,16 +7,14 @@ import Sidebar from "./Sidebar";
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const userRole = 'pm' as const; // This would come from auth context
 
   return (
     <div className="min-h-screen bg-background">
       <div className="flex h-screen">
         {/* Sidebar */}
-        <Sidebar 
-          isOpen={sidebarOpen} 
+        <Sidebar
+          isOpen={sidebarOpen}
           onToggle={() => setSidebarOpen(!sidebarOpen)}
-          userRole={userRole}
         />
 
         {/* Main content */}
@@ -33,7 +31,7 @@ export default function Layout() {
                 >
                   <Menu className="w-5 h-5" />
                 </Button>
-                
+
                 {/* Search */}
                 <div className="relative hidden md:block">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
