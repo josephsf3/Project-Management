@@ -1,24 +1,42 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { Project } from "@/types/projects";
-
+import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "@/context/AuthContext";
+import { DashProject } from "@/types/dashboard";
+import { fetchDashboardProjects } from "@/services/api";
 
 
 
 export default function ProjectProgress() {
 
-  const [projects, setProjects] = useState<Project[]>([]);
-
+  const [projects, setProjects] = useState<DashProject[]>([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const auth = useContext(AuthContext);
+  const token = auth?.token;
 
   useEffect(() => {
-    async function getProjects() {
-      const response = await axios.get<Project[]>('http://localhost:4090/api/projects/all');
-      setProjects(response.data);
+    if (!token) {
+      navigate("/login");
+      return;
     }
-    getProjects();
-  }, []);
 
-  const getStatusBadge = (status: Project['status']) => {
+    const getProjects = async () => {
+      try {
+        const data = await fetchDashboardProjects(token);
+        setProjects(data);
+      } catch (err) {
+        console.error("Error fetching projects:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getProjects();
+  }, [token, navigate]);
+
+
+  const getStatusBadge = (status: DashProject['status']) => {
     const baseClasses = "px-2 py-1 text-xs font-medium rounded-full";
     const colorClasses = {
       'completed': 'bg-success/10 text-success',
@@ -29,6 +47,7 @@ export default function ProjectProgress() {
     return `${baseClasses} ${colorClasses[status]}`;
   };
 
+  if (loading) return <p>Loading...</p>;
 
   return (
     <div className="glass-card p-6 fade-in">

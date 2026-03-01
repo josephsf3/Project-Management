@@ -5,6 +5,11 @@ export const getProjects = async (req, res) => {
   // const projects = await Project.find().populate('team', 'username role');
   res.json(projects);
 };
+// export const getDashboardProjects = async (req, res) => {
+//   const projects = await Project.find().populate();
+//   // const projects = await Project.find().populate('team', 'username role');
+//   res.json(projects);
+// };
 
 export const createProject = async (req, res) => {
   const { name, team } = req.body;

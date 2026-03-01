@@ -1,22 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Plus, Filter, Calendar, User, Flag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Task } from "@/types/tasks";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "@/context/AuthContext";
+import { fetchTasks } from "@/services/api";
 import axios from "axios";
-
-export interface Task {
-  _id: string;
-  title: string;
-  description: string;
-  assignee: string;
-  project: string;
-  priority: 'high' | 'medium' | 'low';
-  status: 'todo' | 'progress' | 'review' | 'done';
-  dueDate: string;
-  createdAt: string;
-}
-
 
 export default function Tasks() {
   const [selectedStatus, setSelectedStatus] = useState<'all' | Task['status']>('all');
@@ -33,13 +24,30 @@ export default function Tasks() {
     dueDate: ''
   });
 
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const auth = useContext(AuthContext);
+  const token = auth?.token;
+
   useEffect(() => {
-    async function getTasks() {
-      const response = await axios.get('http://localhost:4090/api/tasks/all');
-      setTasks(response.data);
+    if (!token) {
+      navigate("/login");
+      return;
     }
+
+    const getTasks = async () => {
+      try {
+        const data = await fetchTasks(token);
+        setTasks(data);
+      } catch (err) {
+        console.error("Error fetching projects:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     getTasks();
-  }, []);
+  }, [token, navigate]);
 
   const filteredTasks = tasks.filter(task => {
     const matchesStatus = selectedStatus === 'all' || task.status === selectedStatus;
@@ -93,6 +101,9 @@ export default function Tasks() {
       console.error("Error creating task:", error);
     }
   };
+
+    if (loading) return <p>Loading...</p>;
+
 
   return (
     <div className="space-y-6">

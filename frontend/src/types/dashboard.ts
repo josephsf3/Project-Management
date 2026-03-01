@@ -10,18 +10,18 @@ export interface Stat {
 }
 
 // Individual project
-export interface Project {
-  id: string;
+export interface DashProject {
+  _id: string;
   name: string;
   progress: number; // percentage 0-100
   dueDate: string; // formatted date string
-  team: number; // number of team members
+  teamSize: number; // number of team members
   status: "on-track" | "at-risk" | "completed" | "delayed";
 }
 
 // Individual task
-export interface Task {
-  id: string;
+export interface DashTask {
+  _id: string;
   title: string;
   assignee: string;
   priority: "low" | "medium" | "high";
@@ -29,10 +29,3 @@ export interface Task {
   dueDate: string; // formatted date string
 }
 
-// Full Dashboard data
-export interface DashboardData {
-  stats: Stat[];
-  projects: Project[];
-  tasks: Task[];
-  userName: string;
-}

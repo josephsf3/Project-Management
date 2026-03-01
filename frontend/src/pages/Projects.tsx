@@ -6,7 +6,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Project } from "@/types/projects";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "@/context/AuthContext";
+import { DashProject } from "@/types/dashboard";
+import { fetchProjects } from "@/services/api";
 
 export default function Projects() {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -23,13 +27,30 @@ export default function Projects() {
   const [newStatus, setNewStatus] = useState<'active' | 'completed' | 'on-hold'>('active');
   const [newPriority, setNewPriority] = useState<'high' | 'medium' | 'low'>('medium');
 
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const auth = useContext(AuthContext);
+  const token = auth?.token;
+
   useEffect(() => {
-    async function getProjects() {
-      const response = await axios.get<Project[]>('http://localhost:4090/api/projects/all');
-      setProjects(response.data);
+    if (!token) {
+      navigate("/login");
+      return;
     }
+
+    const getProjects = async () => {
+      try {
+        const data = await fetchProjects(token);
+        setProjects(data);
+      } catch (err) {
+        console.error("Error fetching projects:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     getProjects();
-  }, []);
+  }, [token, navigate]);
 
   const handleCreateProject = async () => {
     if (!newName) return alert("Project name is required");
@@ -74,6 +95,8 @@ export default function Projects() {
     'low': 'bg-success/10 text-success'
   }[priority]);
 
+  if (loading) return <p>Loading...</p>;
+
   return (
     <div className="space-y-6">
 
@@ -99,10 +122,10 @@ export default function Projects() {
             <div className="flex flex-col gap-3">
               <Input placeholder="Project Name" value={newName} onChange={e => setNewName(e.target.value)} />
               <Textarea placeholder="Project Description" value={newDescription} onChange={e => setNewDescription(e.target.value)} />
-              <p className="text-muted-foreground" style={{fontSize:"13px"}}>Team:</p>
+              <p className="text-muted-foreground" style={{ fontSize: "13px" }}>Team:</p>
               <Input type="number" placeholder="Team Size" value={newTeamSize} min={1} onChange={e => setNewTeamSize(Number(e.target.value))} />
               <Input type="date" value={newDueDate} onChange={e => setNewDueDate(e.target.value)} />
-              <p className="text-muted-foreground" style={{fontSize:"13px"}} >Progress:</p>
+              <p className="text-muted-foreground" style={{ fontSize: "13px" }} >Progress:</p>
               <Input type="number" placeholder="Progress %" value={newProgress} min={0} max={100} onChange={e => setNewProgress(Number(e.target.value))} />
 
               <div className="flex gap-2">
